@@ -6,19 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:insta/responsive/mobile_screen_layout.dart';
 import 'package:insta/responsive/responsive_layout_screen.dart';
 import 'package:insta/responsive/web_screen_layout.dart';
+import 'package:insta/screens/login_screen.dart';
 import 'package:insta/secrets/secret.dart';
 import 'package:insta/utils/colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
-    log(kIsWeb.toString());
+    log(
+      kIsWeb.toString(),
+    ); // for logging whether the target device is web or not
     await Firebase.initializeApp(
       options: const FirebaseOptions(
         apiKey: apiKey,
         appId: appId,
         messagingSenderId: messagingSenderId,
         projectId: projectId,
+        storageBucket: "insta-bdf99.firebasestorage.app",
       ),
     );
   } else {
@@ -38,12 +42,11 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: mobileBackgroundColor,
       ),
       debugShowCheckedModeBanner: false,
-      home: const Scaffold(
-        body: ResponsiveLayoutScreen(
-          webScreenLayout: WebScreenLayout(),
-          mobileScreenLayout: MobileScreenLayout(),
-        ),
-      ),
+      // home: const ResponsiveLayoutScreen(
+      //   webScreenLayout: WebScreenLayout(),
+      //   mobileScreenLayout: MobileScreenLayout(),
+      // ),
+      home: const LoginScreen(),
     );
   }
 }
