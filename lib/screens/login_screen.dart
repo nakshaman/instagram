@@ -1,8 +1,11 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:insta/resources/auth_methods.dart';
 import 'package:insta/utils/colors.dart';
+import 'package:insta/utils/utils.dart';
 import 'package:insta/widgets/text_input_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,11 +19,39 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _isLoading = false;
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void logInUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthMethods().logInUser(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+    if (res != "sucess") {
+      if (mounted) {
+        showSnackBar(res, context);
+      }
+    } else {
+      log(res);
+      log(FirebaseAuth.instance.currentUser!.uid);
+      _emailController.clear();
+      _passwordController.clear();
+      // Navigate to the home screen
+    }
   }
 
   @override
@@ -59,9 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 24,
               ),
               InkWell(
-                onTap: () {
-                  log('hello world');
-                },
+                onTap: logInUser,
                 child: Container(
                   width: double.infinity,
                   alignment: Alignment.center,
@@ -74,7 +103,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     color: blueColor,
                   ),
-                  child: const Text('Log in'),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 21,
+                          width: 21,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                          ),
+                        )
+                      : const Text('Log in'),
                 ),
               ),
               const SizedBox(

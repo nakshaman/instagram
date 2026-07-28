@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -164,26 +165,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
               // button
               InkWell(
                 onTap: signUpUser,
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        strokeWidth: 1,
-                        backgroundColor: mobileBackgroundColor,
-                        color: Colors.white,
-                      )
-                    : Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: const ShapeDecoration(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(4),
-                            ),
-                          ),
-                          color: blueColor,
-                        ),
-                        child: const Text('Sign Up'),
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(4),
                       ),
+                    ),
+                    color: blueColor,
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 21,
+                          width: 21,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                            backgroundColor: mobileBackgroundColor,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Sign Up'),
+                ),
               ),
               const SizedBox(
                 height: 24,
