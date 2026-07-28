@@ -1,8 +1,13 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:insta/resources/auth_methods.dart';
 import 'package:insta/utils/colors.dart';
+import 'package:insta/utils/utils.dart';
 import 'package:insta/widgets/text_input_field.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -17,6 +22,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+
+  Uint8List? _image;
+  bool _isLoading = false;
+
+  void selectImage() async {
+    Uint8List? image = await pickImage(ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+    setState(() {
+      _image = image;
+    });
+  }
+
+  void signUpUser() async {
+    if (_image == null) {
+      showSnackBar('Please select a profile picture', context);
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthMethods().signUpUser(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+      username: _usernameController.text.trim(),
+      bio: _bioController.text.trim(),
+      file: _image!,
+    );
+    log(res);
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+    if (res != 'sucess') {
+      if (mounted) {
+        showSnackBar(res, context);
+      } else {
+        // navigate
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -48,18 +96,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 64,
-                    backgroundImage: NetworkImage(
-                      'https://plus.unsplash.com/premium_photo-1677252438411-9a930d7a5168?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8dXNlciUyMGltYWdlfGVufDB8fDB8fHww',
-                    ),
-                  ),
+                  _image != null
+                      ? CircleAvatar(
+                          radius: 64,
+                          backgroundImage: MemoryImage(_image!),
+                        )
+                      : const CircleAvatar(
+                          radius: 64,
+                          backgroundColor: blackColor,
+                          child: HugeIcon(
+                            icon: HugeIcons.strokeRoundedUser03,
+                            size: 50,
+                          ),
+                        ),
                   Positioned(
                     bottom: -10,
                     left: 80,
                     child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.add_a_photo),
+                      onPressed: selectImage,
+                      icon: const HugeIcon(
+                        icon: HugeIcons.strokeRoundedCamera01,
+                      ),
                     ),
                   ),
                 ],
@@ -97,7 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               // bio field
               TextInputField(
-                controller: _usernameController,
+                controller: _bioController,
                 hintText: 'Bio',
                 textInputType: TextInputType.none,
               ),
@@ -106,23 +163,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               // button
               InkWell(
-                onTap: () {
-                  log('hello world');
-                },
-                child: Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: const ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(4),
+                onTap: signUpUser,
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                        strokeWidth: 1,
+                        backgroundColor: mobileBackgroundColor,
+                        color: Colors.white,
+                      )
+                    : Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: const ShapeDecoration(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(4),
+                            ),
+                          ),
+                          color: blueColor,
+                        ),
+                        child: const Text('Sign Up'),
                       ),
-                    ),
-                    color: blueColor,
-                  ),
-                  child: const Text('Log in'),
-                ),
               ),
               const SizedBox(
                 height: 24,
