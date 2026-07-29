@@ -4,10 +4,21 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:insta/resources/storage_method.dart';
+import 'package:insta/models/user.dart' as model;
 
 class AuthMethods {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+
+  // user detail
+  Future<model.User> getUserDetail() async {
+    User currentUser = _firebaseAuth.currentUser!;
+    DocumentSnapshot snap = await _firebaseFirestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+    return model.User.fromSnap(snap);
+  }
 
   // sign up user
   Future<String> signUpUser({
@@ -24,28 +35,32 @@ class AuthMethods {
           username.isNotEmpty &&
           file != null) {
         // register user
+
         final UserCredential userCredential = await _firebaseAuth
             .createUserWithEmailAndPassword(email: email, password: password);
         log(userCredential.user?.uid ?? "");
         // add profile picture
+
         String url = await StorageMethod().storePicture(
           'profilePics',
           file,
           false,
         );
         // add user to database
+
+        model.User user = model.User(
+          email: email,
+          uid: userCredential.user!.uid,
+          photoUrl: url,
+          username: username,
+          bio: bio,
+          followers: [],
+          following: [],
+        );
         await _firebaseFirestore
             .collection('users')
             .doc(userCredential.user!.uid)
-            .set({
-              'username': username,
-              'email': email,
-              'bio': bio,
-              'uid': userCredential.user!.uid,
-              'followers': [],
-              'following': [],
-              'photoUrl': url,
-            });
+            .set(user.toJson());
         res = "sucess";
       } else {
         res = 'No Fields are filled';

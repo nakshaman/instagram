@@ -14,9 +14,10 @@ Future<Uint8List?> pickImage(ImageSource imageSource) async {
     return pickedImage.readAsBytes();
   }
   log('No Image Selected');
+  return null;
 }
 
-showSnackBar(String content, BuildContext context) {
+void showSnackBar(String content, BuildContext context) {
   ScaffoldMessenger.of(context).clearSnackBars();
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
