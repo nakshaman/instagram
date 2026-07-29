@@ -83,7 +83,11 @@ class AuthMethods {
       }
     } on FirebaseAuthException catch (e) {
       log(e.message!);
-      res = e.message ?? "Authentication error ";
+      if (e.code == "user-not-found") {
+        res = 'User not found';
+      } else if (e.code == "wrong-password") {
+        res = 'Wrong password';
+      }
     } catch (e) {
       log(e.toString());
     }
