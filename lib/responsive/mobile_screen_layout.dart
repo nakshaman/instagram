@@ -1,10 +1,7 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:insta/utils/global_variables.dart';
 
 class MobileScreenLayout extends StatefulWidget {
   const MobileScreenLayout({super.key});
@@ -14,40 +11,43 @@ class MobileScreenLayout extends StatefulWidget {
 }
 
 class _MobileScreenLayoutState extends State<MobileScreenLayout> {
-  late String username = "";
-  var currentPageIndex = 0;
+  int currentPageIndex = 0;
+  late PageController pageController;
   @override
   void initState() {
     super.initState();
-    getUsername();
+    pageController = PageController();
   }
 
-  void getUsername() async {
-    final firebaseAuth = FirebaseAuth.instance;
-    final userId = firebaseAuth.currentUser!.uid;
-    final DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .get();
-
-    log(snapshot.data().toString());
-    setState(() {
-      username = (snapshot.data() as Map<String, dynamic>)['username'];
-    });
+  @override
+  void dispose() {
+    super.dispose();
+    pageController.dispose();
   }
 
   void onTabChange(int index) {
     setState(() {
       currentPageIndex = index;
-      log(index.toString());
+    });
+    pageController.jumpToPage(index);
+  }
+
+  void onPageChanged(int index) {
+    setState(() {
+      currentPageIndex = index;
     });
   }
+
+  final List<Widget> _pages = homeScreenItems;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const Center(
-        child: Text('Hello world'),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: onPageChanged,
+        physics: const NeverScrollableScrollPhysics(), // to stop swipe
+        children: _pages,
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
@@ -58,6 +58,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           margin: const EdgeInsets.symmetric(horizontal: 10),
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: GNav(
+            selectedIndex: currentPageIndex,
             gap: 5,
             onTabChange: onTabChange,
             tabBorderRadius: 20,
@@ -90,7 +91,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               GButton(
                 icon: Icons.circle,
                 // text: 'Profile',
-                leading: HugeIcon(icon: HugeIcons.strokeRoundedUser),
+                leading: HugeIcon(icon: HugeIcons.strokeRoundedUser03),
               ),
             ],
           ),
