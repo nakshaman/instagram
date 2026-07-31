@@ -42,7 +42,6 @@ class FeedScreen extends StatelessWidget {
                 slivers: [
                   SliverAppBar(
                     expandedHeight: 70,
-                    floating: true,
                     title: SvgPicture.asset(
                       'assets/ic_instagram.svg',
                       color: primaryColor,

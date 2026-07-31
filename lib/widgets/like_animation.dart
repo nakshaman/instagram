@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
 class LikeAnimation extends StatefulWidget {
@@ -36,6 +34,10 @@ class _LikeAnimationState extends State<LikeAnimation>
     scale = Tween<double>(begin: 1, end: 1.2).animate(animationController);
   }
 
+  // didUpdateWidget is called when the parent calls this widget with new values otherwise
+  // it will be called on every build
+  // only start animation when the parent widget calls this widget with new values
+  // so we check widget.isAnimating != oldWidget.isAnimating
   @override
   void didUpdateWidget(covariant LikeAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);

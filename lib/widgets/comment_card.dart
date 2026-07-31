@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:insta/models/user.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class CommentCard extends StatefulWidget {
-  const CommentCard({super.key});
+  final commentId;
+  const CommentCard({super.key, required this.commentId});
 
   @override
   State<CommentCard> createState() => _CommentCardState();
@@ -15,11 +17,10 @@ class _CommentCardState extends State<CommentCard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(
-            backgroundImage: NetworkImage(
-              'https://plus.unsplash.com/premium_photo-1785080652560-f334e6ea704c?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            ),
+          CircleAvatar(
+            backgroundImage: NetworkImage(widget.commentId['profilePic']),
             radius: 18,
           ),
           Expanded(
@@ -33,15 +34,19 @@ class _CommentCardState extends State<CommentCard> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'username  ',
+                          text: '${widget.commentId['name']}  ',
                           style: Theme.of(context).textTheme.bodyMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                         ),
-                        const TextSpan(
-                          text: 'Hello this is some  !',
+                        TextSpan(
+                          text: '${widget.commentId['text']}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ],
                     ),
@@ -49,7 +54,9 @@ class _CommentCardState extends State<CommentCard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      '23/11/23',
+                      DateFormat.yMMMd().format(
+                        widget.commentId['datePublished'].toDate(),
+                      ),
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         fontWeight: FontWeight.w400,
                       ),
@@ -59,9 +66,9 @@ class _CommentCardState extends State<CommentCard> {
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: const Icon(
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
               Icons.favorite,
               size: 16,
             ),

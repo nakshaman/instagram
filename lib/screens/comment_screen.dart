@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:insta/models/user.dart';
 import 'package:insta/provider/user_provider.dart';
 import 'package:insta/resources/firestore_methods.dart';
-import 'package:insta/screens/comment_card.dart';
+import 'package:insta/widgets/comment_card.dart';
 import 'package:insta/utils/colors.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +54,34 @@ class _CommentScreenState extends State<CommentScreen> {
           ),
         ),
       ),
-      body: CommentCard(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('posts')
+            .doc(widget.snap['postId'])
+            .collection('comments')
+            .snapshots(),
+        builder:
+            (
+              context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot,
+            ) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                  ),
+                );
+              }
+              return ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  return CommentCard(
+                    commentId: snapshot.data!.docs[index].data(),
+                  );
+                },
+              );
+            },
+      ),
       // comment textfield section
       bottomNavigationBar: SafeArea(
         child: Container(
