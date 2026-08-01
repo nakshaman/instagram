@@ -59,7 +59,7 @@ class FeedScreen extends StatelessWidget {
                   SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       return PostCard(
-                        snap: snapshot.data!.docs[index].data(),
+                        post: snapshot.data!.docs[index].data(),
                       );
                     }, childCount: snapshot.data!.docs.length),
                   ),

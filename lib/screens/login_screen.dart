@@ -52,19 +52,17 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       log(res);
       log(FirebaseAuth.instance.currentUser!.uid);
-      _emailController.clear();
-      _passwordController.clear();
       // Navigate to the home screen
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) =>  const ResponsiveLayoutScreen(
-              webScreenLayout: WebScreenLayout(),
-              mobileScreenLayout: MobileScreenLayout(),
-            ),
-          ),
-        );
-      }
+      // if (mounted) {
+      //   Navigator.of(context).pushReplacement(
+      //     MaterialPageRoute(
+      //       builder: (context) => const ResponsiveLayoutScreen(
+      //         webScreenLayout: WebScreenLayout(),
+      //         mobileScreenLayout: MobileScreenLayout(),
+      //       ),
+      //     ),
+      //   );
+      // }
     }
   }
 

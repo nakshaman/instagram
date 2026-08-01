@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:insta/models/user.dart';
+import 'package:insta/resources/firestore_methods.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class CommentCard extends StatefulWidget {
-  final commentId;
-  const CommentCard({super.key, required this.commentId});
+  final Map<String, dynamic> comment;
+  final String postId;
+  const CommentCard({super.key, required this.comment, required this.postId});
 
   @override
   State<CommentCard> createState() => _CommentCardState();
@@ -17,10 +17,9 @@ class _CommentCardState extends State<CommentCard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage(widget.commentId['profilePic']),
+            backgroundImage: NetworkImage(widget.comment['profilePic']),
             radius: 18,
           ),
           Expanded(
@@ -34,7 +33,7 @@ class _CommentCardState extends State<CommentCard> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: '${widget.commentId['name']}  ',
+                          text: '${widget.comment['name']}  ',
                           style: Theme.of(context).textTheme.bodyMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
@@ -42,7 +41,7 @@ class _CommentCardState extends State<CommentCard> {
                               ),
                         ),
                         TextSpan(
-                          text: '${widget.commentId['text']}',
+                          text: '${widget.comment['text']}',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
@@ -55,7 +54,7 @@ class _CommentCardState extends State<CommentCard> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       DateFormat.yMMMd().format(
-                        widget.commentId['datePublished'].toDate(),
+                        widget.comment['datePublished'].toDate(),
                       ),
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         fontWeight: FontWeight.w400,
@@ -66,12 +65,25 @@ class _CommentCardState extends State<CommentCard> {
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.favorite,
-              size: 16,
-            ),
+          Column(
+            children: [
+              IconButton(
+                style: IconButton.styleFrom(),
+                onPressed: () async {
+                  FirestoreMethods().likeComment(
+                    commentId: widget.comment['commentId'],
+                    uid: widget.comment['uid'],
+                    likes: widget.comment['likes'],
+                    postId: widget.postId,
+                  );
+                },
+                icon: const Icon(
+                  Icons.favorite,
+                  size: 16,
+                ),
+              ),
+              Text('22'),
+            ],
           ),
         ],
       ),

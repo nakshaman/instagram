@@ -91,10 +91,44 @@ class FirestoreMethods {
                 'text': text,
                 'commentId': commentId,
                 'datePublished': DateTime.now(),
+                'likes': [],
               },
             );
       } else {
         log('comment text is empty');
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  // like comment
+
+  Future<void> likeComment({
+    required String commentId,
+    required String uid,
+    required List likes,
+    required String postId,
+  }) async {
+    try {
+      if (likes.contains(uid)) {
+        await _firebaseFirestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .update({
+              'likes': FieldValue.arrayRemove([uid]),
+            });
+      } else {
+        await _firebaseFirestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+              'likes': FieldValue.arrayUnion([uid]),
+            });
       }
     } catch (e) {
       log(e.toString());

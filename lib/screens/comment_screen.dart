@@ -8,8 +8,8 @@ import 'package:insta/utils/colors.dart';
 import 'package:provider/provider.dart';
 
 class CommentScreen extends StatefulWidget {
-  final snap;
-  const CommentScreen({super.key, required this.snap});
+  final String postId;
+  const CommentScreen({super.key, required this.postId});
 
   @override
   State<CommentScreen> createState() => _CommentScreenState();
@@ -35,30 +35,23 @@ class _CommentScreenState extends State<CommentScreen> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         centerTitle: true,
-        leadingWidth: 56,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.black.withOpacity(0.5),
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                size: 22,
-                color: Colors.white,
-              ),
-            ),
+        leading: IconButton(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            size: 22,
+            color: Colors.white,
           ),
         ),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('posts')
-            .doc(widget.snap['postId'])
+            .doc(widget.postId)
             .collection('comments')
+            .orderBy('datePublished', descending: false)
             .snapshots(),
         builder:
             (
@@ -76,7 +69,8 @@ class _CommentScreenState extends State<CommentScreen> {
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   return CommentCard(
-                    commentId: snapshot.data!.docs[index].data(),
+                    comment: snapshot.data!.docs[index].data(),
+                    postId: widget.postId,
                   );
                 },
               );
@@ -87,7 +81,7 @@ class _CommentScreenState extends State<CommentScreen> {
         child: Container(
           height: kToolbarHeight,
           margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 5,
           ),
           padding: const EdgeInsets.only(left: 16, right: 8),
           child: Row(
@@ -109,11 +103,11 @@ class _CommentScreenState extends State<CommentScreen> {
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(24),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(24),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                     ),
@@ -123,7 +117,7 @@ class _CommentScreenState extends State<CommentScreen> {
               InkWell(
                 onTap: () async {
                   await FirestoreMethods().postComment(
-                    widget.snap['postId'],
+                    widget.postId,
                     _commentController.text.trim(),
                     user.uid,
                     user.username,
@@ -136,12 +130,11 @@ class _CommentScreenState extends State<CommentScreen> {
                     horizontal: 8,
                     vertical: 8,
                   ),
-                  child: Text(
-                    'Post',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium!.copyWith(color: blueColor),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    color: blueColor,
                   ),
+                  child: const Icon(Icons.arrow_upward),
                 ),
               ),
             ],

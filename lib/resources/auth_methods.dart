@@ -17,6 +17,10 @@ class AuthMethods {
         .collection('users')
         .doc(currentUser.uid)
         .get();
+    if (!snap.exists) {
+      await _firebaseAuth.signOut();
+      log('user log out');
+    }
     return model.User.fromSnap(snap);
   }
 
