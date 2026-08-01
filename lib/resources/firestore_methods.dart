@@ -126,7 +126,7 @@ class FirestoreMethods {
             .doc(postId)
             .collection('comments')
             .doc(commentId)
-            .set({
+            .update({
               'likes': FieldValue.arrayUnion([uid]),
             });
       }

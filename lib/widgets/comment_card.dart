@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:insta/provider/user_provider.dart';
 import 'package:insta/resources/firestore_methods.dart';
+import 'package:insta/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class CommentCard extends StatefulWidget {
   final Map<String, dynamic> comment;
@@ -12,8 +15,11 @@ class CommentCard extends StatefulWidget {
 }
 
 class _CommentCardState extends State<CommentCard> {
+  bool isAnimating = false;
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).getUser;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       child: Row(
@@ -67,22 +73,33 @@ class _CommentCardState extends State<CommentCard> {
           ),
           Column(
             children: [
-              IconButton(
-                style: IconButton.styleFrom(),
-                onPressed: () async {
-                  FirestoreMethods().likeComment(
-                    commentId: widget.comment['commentId'],
-                    uid: widget.comment['uid'],
-                    likes: widget.comment['likes'],
-                    postId: widget.postId,
-                  );
+              LikeAnimation(
+                isAnimating: isAnimating,
+                onEnd: () {
+                  setState(() {
+                    isAnimating = false;
+                  });
                 },
-                icon: const Icon(
-                  Icons.favorite,
-                  size: 16,
+
+                child: IconButton(
+                  onPressed: () async {
+                    await FirestoreMethods().likeComment(
+                      commentId: widget.comment['commentId'],
+                      uid: user!.uid,
+                      likes: widget.comment['likes'],
+                      postId: widget.postId,
+                    );
+                    setState(() {
+                      isAnimating = true;
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.favorite,
+                    size: 16,
+                  ),
                 ),
               ),
-              Text('22'),
+              Text(widget.comment['likes'].length.toString()),
             ],
           ),
         ],

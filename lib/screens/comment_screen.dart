@@ -51,7 +51,7 @@ class _CommentScreenState extends State<CommentScreen> {
             .collection('posts')
             .doc(widget.postId)
             .collection('comments')
-            .orderBy('datePublished', descending: false)
+            .orderBy('datePublished', descending: true)
             .snapshots(),
         builder:
             (
@@ -116,13 +116,15 @@ class _CommentScreenState extends State<CommentScreen> {
               ),
               InkWell(
                 onTap: () async {
-                  await FirestoreMethods().postComment(
-                    widget.postId,
-                    _commentController.text.trim(),
-                    user.uid,
-                    user.username,
-                    user.photoUrl,
-                  );
+                  _commentController.text.isEmpty
+                      ? null
+                      : await FirestoreMethods().postComment(
+                          widget.postId,
+                          _commentController.text.trim(),
+                          user.uid,
+                          user.username,
+                          user.photoUrl,
+                        );
                   _commentController.clear();
                 },
                 child: Container(
@@ -144,3 +146,14 @@ class _CommentScreenState extends State<CommentScreen> {
     );
   }
 }
+
+                  // _commentController.text.isEmpty
+                  //     ? null
+                  //     : await FirestoreMethods().postComment(
+                  //         widget.postId,
+                  //         _commentController.text.trim(),
+                  //         user.uid,
+                  //         user.username,
+                  //         user.photoUrl,
+                  //       );
+                  // _commentController.clear();
