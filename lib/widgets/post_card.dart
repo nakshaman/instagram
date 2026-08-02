@@ -6,6 +6,7 @@ import 'package:insta/provider/user_provider.dart';
 import 'package:insta/resources/firestore_methods.dart';
 import 'package:insta/screens/comment_screen.dart';
 import 'package:insta/utils/colors.dart';
+import 'package:insta/utils/utils.dart';
 import 'package:insta/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     log('Build called');
-    log(widget.post.toString());
+    // log(widget.post.toString());
 
     final user = Provider.of<UserProvider>(context).getUser!;
     return Container(
@@ -66,25 +67,44 @@ class _PostCardState extends State<PostCard> {
                 ),
                 IconButton(
                   onPressed: () {
-                    showDialog(
+                    showModalBottomSheet(
                       context: context,
+                      backgroundColor: mobileBackgroundColor,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(24),
+                        ),
+                      ),
                       builder: (context) {
-                        return Dialog(
-                          child: ListView(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shrinkWrap: true,
-                            children: ['Delete'].map((e) {
-                              return InkWell(
-                                onTap: () {},
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                    horizontal: 16,
+                        return SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListTile(
+                                  leading: const HugeIcon(
+                                    icon: HugeIcons.strokeRoundedDelete01,
                                   ),
-                                  child: Text(e),
+                                  title: const Text(
+                                    "Delete Post",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.pop(context);
+
+                                    final res = await FirestoreMethods()
+                                        .deletePost(
+                                          widget.post['postId'],
+                                        );
+                                    showSnackBar(
+                                      res,
+                                      context,
+                                    );
+                                  },
                                 ),
-                              );
-                            }).toList(),
+                              ],
+                            ),
                           ),
                         );
                       },

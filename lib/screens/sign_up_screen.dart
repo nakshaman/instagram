@@ -56,7 +56,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       bio: _bioController.text.trim(),
       file: _image!,
     );
-    log(res);
     if (mounted) {
       setState(() {
         _isLoading = false;

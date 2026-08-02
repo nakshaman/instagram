@@ -56,12 +56,20 @@ class FeedScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      return PostCard(
-                        post: snapshot.data!.docs[index].data(),
-                      );
-                    }, childCount: snapshot.data!.docs.length),
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom + 70,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return PostCard(
+                            post: snapshot.data!.docs[index].data(),
+                          );
+                        },
+                        childCount: snapshot.data!.docs.length,
+                      ),
+                    ),
                   ),
                 ],
               );
