@@ -10,8 +10,10 @@ import 'package:insta/responsive/responsive_layout_screen.dart';
 import 'package:insta/responsive/web_screen_layout.dart';
 import 'package:insta/screens/login_screen.dart';
 import 'package:insta/utils/colors.dart';
+import 'package:insta/utils/global_variables.dart';
 import 'package:insta/utils/utils.dart';
 import 'package:insta/widgets/text_input_field.dart';
+import 'package:lottie/lottie.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -95,143 +97,164 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isWeb = screenWidth > webScreenSize;
+
+    Widget formContent = SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Instagram Logo
+            SvgPicture.asset(
+              'assets/ic_instagram.svg',
+              colorFilter: const ColorFilter.mode(
+                primaryColor,
+                BlendMode.srcIn,
+              ),
+              height: 64,
+            ),
+            const SizedBox(height: 32),
+
+            // Profile Picture Picker
+            Stack(
+              children: [
+                _image != null
+                    ? CircleAvatar(
+                        radius: 64,
+                        backgroundImage: MemoryImage(_image!),
+                      )
+                    : const CircleAvatar(
+                        radius: 64,
+                        backgroundColor: blackColor,
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedUser03,
+                          size: 50,
+                        ),
+                      ),
+                Positioned(
+                  bottom: -10,
+                  left: 80,
+                  child: IconButton(
+                    onPressed: selectImage,
+                    icon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedCamera01,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Username Field
+            TextInputField(
+              controller: _usernameController,
+              hintText: 'Username',
+              textInputType: TextInputType.text,
+            ),
+            const SizedBox(height: 24),
+
+            // Email Field
+            TextInputField(
+              controller: _emailController,
+              hintText: 'Email',
+              textInputType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 24),
+
+            // Password Field
+            TextInputField(
+              controller: _passwordController,
+              hintText: 'Password',
+              textInputType: TextInputType.visiblePassword,
+              isObsecureText: true,
+            ),
+            const SizedBox(height: 24),
+
+            // Bio Field
+            TextInputField(
+              controller: _bioController,
+              hintText: 'Bio',
+              textInputType: TextInputType.text,
+            ),
+            const SizedBox(height: 24),
+
+            // Sign Up Button
+            InkWell(
+              onTap: signUpUser,
+              child: Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: const ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                  ),
+                  color: blueColor,
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 21,
+                        width: 21,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1,
+                          backgroundColor: mobileBackgroundColor,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Sign Up'),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Navigation to Login
+            GestureDetector(
+              onTap: navigateToLogIn,
+              child: RichText(
+                text: TextSpan(
+                  text: 'Already have an account? ',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.w300,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Log In',
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // instagram logo
-              SvgPicture.asset(
-                'assets/ic_instagram.svg',
-                color: primaryColor,
-                height: 64,
-              ),
-              const SizedBox(
-                height: 64,
-              ),
-              Stack(
-                children: [
-                  _image != null
-                      ? CircleAvatar(
-                          radius: 64,
-                          backgroundImage: MemoryImage(_image!),
-                        )
-                      : const CircleAvatar(
-                          radius: 64,
-                          backgroundColor: blackColor,
-                          child: HugeIcon(
-                            icon: HugeIcons.strokeRoundedUser03,
-                            size: 50,
-                          ),
+        child: Center(
+          child: isWeb
+              ? Row(
+                  children: [
+                    // Left Side: Lottie Animation
+                    Expanded(
+                      child: Center(
+                        child: Lottie.asset(
+                          'assets/hello.json', 
+                          fit: BoxFit.contain,
                         ),
-                  Positioned(
-                    bottom: -10,
-                    left: 80,
-                    child: IconButton(
-                      onPressed: selectImage,
-                      icon: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedCamera01,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              // username field
-              TextInputField(
-                controller: _usernameController,
-                hintText: 'Username',
-                textInputType: TextInputType.none,
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              // email field
-              TextInputField(
-                controller: _emailController,
-                hintText: 'Email',
-                textInputType: TextInputType.emailAddress,
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              // password field
-              TextInputField(
-                controller: _passwordController,
-                hintText: 'Password',
-                textInputType: TextInputType.visiblePassword,
-                isObsecureText: true,
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              // bio field
-              TextInputField(
-                controller: _bioController,
-                hintText: 'Bio',
-                textInputType: TextInputType.none,
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              // button
-              InkWell(
-                onTap: signUpUser,
-                child: Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: const ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(4),
-                      ),
+                    // Right Side: Sign-Up Form
+                    Expanded(
+                      child: formContent,
                     ),
-                    color: blueColor,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 21,
-                          width: 21,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1,
-                            backgroundColor: mobileBackgroundColor,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Sign Up'),
-                ),
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              GestureDetector(
-                onTap: navigateToLogIn,
-                child: RichText(
-                  text: TextSpan(
-                    text: 'Already have an account ? ',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontWeight: FontWeight.w300,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: ' Log In',
-                        style: Theme.of(context).textTheme.titleMedium!
-                            .copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+                  ],
+                )
+              : formContent, // Mobile Layout
         ),
       ),
     );

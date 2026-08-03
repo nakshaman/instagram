@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:insta/models/user.dart';
+import 'package:insta/models/user.dart' as model;
 import 'package:insta/provider/user_provider.dart';
+import 'package:insta/screens/add_post_screen.dart';
+import 'package:insta/screens/feed_screen.dart';
+import 'package:insta/screens/profile_screen.dart';
+import 'package:insta/screens/search_screen.dart';
 import 'package:insta/utils/colors.dart';
-import 'package:insta/utils/global_variables.dart';
 import 'package:provider/provider.dart';
 
 class MobileScreenLayout extends StatefulWidget {
@@ -42,11 +46,9 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
     });
   }
 
-  final List<Widget> _pages = homeScreenItems;
-
   @override
   Widget build(BuildContext context) {
-    final User? user = Provider.of<UserProvider>(context).getUser;
+    final model.User? user = Provider.of<UserProvider>(context).getUser;
     if (user == null) {
       return const Center(
         child: SizedBox(
@@ -65,7 +67,17 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         controller: pageController,
         onPageChanged: onPageChanged,
         physics: const NeverScrollableScrollPhysics(), // to stop swipe
-        children: _pages,
+        children: [
+          const FeedScreen(),
+          const SearchScreen(),
+          const AddPostScreen(),
+          const Center(
+            child: Text('Favorite'),
+          ),
+          ProfileScreen(
+            uid: user.uid,
+          ),
+        ],
       ),
       bottomNavigationBar: SafeArea(
         child: Container(

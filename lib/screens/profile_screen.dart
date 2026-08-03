@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .collection('posts')
           .where(
             'uid',
-            isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+            isEqualTo: widget.uid,
           ) // my code
           .get();
       postLength = userPost.docs.length;

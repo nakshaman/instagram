@@ -93,6 +93,7 @@ class AuthMethods {
     required String email,
     required String password,
   }) async {
+    log("Login button pressed");
     String res = "Some error occured";
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
@@ -114,6 +115,7 @@ class AuthMethods {
     } catch (e) {
       log(e.toString());
     }
+    log("Firebase returned: $res");
     return res;
   }
 
