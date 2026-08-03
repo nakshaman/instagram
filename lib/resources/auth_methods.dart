@@ -13,18 +13,21 @@ class AuthMethods {
   // user detail
   Future<model.User> getUserDetail() async {
     User currentUser = _firebaseAuth.currentUser!;
-    DocumentSnapshot snap = await _firebaseFirestore
-        .collection('users')
-        .doc(currentUser.uid)
-        .get();
-    if (!snap.exists) {
-      await _firebaseAuth.signOut();
-      log('user log out');
-    }
+    DocumentSnapshot snap;
+    do {
+      snap = await _firebaseFirestore
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+      if (!snap.exists) {
+        await Future.delayed(const Duration(milliseconds: 200));
+      }
+    } while (!snap.exists);
     return model.User.fromSnap(snap);
   }
 
   // sign up user
+
   Future<String> signUpUser({
     required String email,
     required String password,
@@ -65,6 +68,7 @@ class AuthMethods {
             .collection('users')
             .doc(userCredential.user!.uid)
             .set(user.toJson());
+        log("Firestore user document created");
         res = "sucess";
       } else {
         res = 'No Fields are filled';
@@ -114,6 +118,7 @@ class AuthMethods {
   }
 
   //logout
+
   Future<void> logout() async {
     await _firebaseAuth.signOut();
   }

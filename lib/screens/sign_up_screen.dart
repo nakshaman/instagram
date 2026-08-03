@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -69,8 +67,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // navigate
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => ResponsiveLayoutScreen(
-            webScreenLayout: const WebScreenLayout(),
+          builder: (context) => const ResponsiveLayoutScreen(
+            webScreenLayout: WebScreenLayout(),
             mobileScreenLayout: MobileScreenLayout(),
           ),
         ),
@@ -88,7 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void navigateToLogIn() {
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => const LoginScreen(),
       ),

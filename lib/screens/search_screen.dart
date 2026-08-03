@@ -29,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         title: TextFormField(
           cursorColor: primaryColor,
-          showCursor: searchController.text.isNotEmpty,
+          showCursor: true,
           controller: searchController,
           decoration: InputDecoration(
             filled: true,

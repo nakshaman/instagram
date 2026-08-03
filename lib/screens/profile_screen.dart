@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:insta/resources/auth_methods.dart';
 import 'package:insta/resources/firestore_methods.dart';
 import 'package:insta/utils/colors.dart';
@@ -46,7 +44,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // post length
       var userPost = await FirebaseFirestore.instance
           .collection('posts')
-          .where('uid', isEqualTo: widget.uid) // my code
+          .where(
+            'uid',
+            isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+          ) // my code
           .get();
       postLength = userPost.docs.length;
       // followers , following
@@ -84,14 +85,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              actions: [
-                IconButton(
-                  onPressed: () async {
-                    await AuthMethods().logout();
-                  },
-                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedLogout01),
-                ),
-              ],
               centerTitle: true,
             ),
             body: ListView(
@@ -130,12 +123,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     FirebaseAuth.instance.currentUser!.uid ==
                                             widget.uid
                                         ? FollowButton(
-                                            text: 'Edit Profile',
+                                            text: 'Sign out',
                                             backgroundColor:
                                                 mobileBackgroundColor,
                                             textColor: primaryColor,
                                             borderColor: Colors.grey,
-                                            function: () {},
+                                            function: () async {
+                                              await AuthMethods().logout();
+                                            },
                                           )
                                         : isFollowing
                                         ? FollowButton(

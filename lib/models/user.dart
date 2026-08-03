@@ -30,7 +30,13 @@ class User {
   };
 
   static User fromSnap(DocumentSnapshot snap) {
-    var snapshot = snap.data() as Map<String, dynamic>;
+    final data = snap.data();
+
+    if (data == null) {
+      throw Exception("User document does not exist.");
+    }
+
+    final snapshot = data as Map<String, dynamic>;
     return User(
       email: snapshot['email'],
       uid: snapshot['uid'],
