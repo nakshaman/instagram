@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:insta/screens/profile_screen.dart';
 import 'package:insta/utils/colors.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -24,14 +28,18 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: TextFormField(
+          cursorColor: primaryColor,
+          showCursor: searchController.text.isNotEmpty,
           controller: searchController,
           decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color.fromARGB(78, 245, 245, 245),
             hint: Row(
               children: [
                 const HugeIcon(
                   icon: HugeIcons.strokeRoundedSearch01,
                   size: 25,
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
                 const SizedBox(
                   width: 10,
@@ -39,24 +47,18 @@ class _SearchScreenState extends State<SearchScreen> {
                 Text(
                   'Search',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Colors.grey,
+                    color: Colors.white,
                     fontSize: 16,
                   ),
                 ),
               ],
             ),
             enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                color: Colors.grey,
-                width: 1.5,
-              ),
+              borderSide: BorderSide.none,
               borderRadius: BorderRadius.circular(24),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                color: blueColor,
-                width: 2.5,
-              ),
+              borderSide: BorderSide.none,
               borderRadius: BorderRadius.circular(24),
             ),
           ),
@@ -105,20 +107,75 @@ class _SearchScreenState extends State<SearchScreen> {
                       itemCount: docs.length,
                       itemBuilder: (context, index) {
                         final user = docs[index].data();
-                        return ListTile(
-                          leading: CircleAvatar(
-                            radius: 24,
-                            backgroundImage: NetworkImage(
-                              user['photoUrl'],
+                        return InkWell(
+                          onTap: () {
+                            log(user['username']);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProfileScreen(uid: user['uid']),
+                              ),
+                            );
+                          },
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              radius: 24,
+                              backgroundImage: NetworkImage(
+                                user['photoUrl'],
+                              ),
                             ),
+                            title: Text(user['username']),
                           ),
-                          title: Text(user['username']),
                         );
                       },
                     );
                   },
             )
-          : const Text('Posts'),
+          : FutureBuilder(
+              future: FirebaseFirestore.instance.collection('posts').get(),
+              builder: (context, posts) {
+                if (posts.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
+                  );
+                }
+                if (posts.hasError) {
+                  return const Center(
+                    child: Text('Something went wrong.'),
+                  );
+                }
+                if (!posts.hasData || posts.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text('No Post yet.'),
+                  );
+                }
+                final docs = posts.data!.docs;
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: StaggeredGrid.count(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 2,
+                    crossAxisSpacing: 3,
+                    children: List.generate(
+                      posts.data!.docs.length,
+                      (index) {
+                        return StaggeredGridTile.count(
+                          crossAxisCellCount: 1,
+                          mainAxisCellCount: index % 7 == 0 ? 2 : 1,
+                          child: Image.network(
+                            posts.data!.docs[index]['postUrl'],
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

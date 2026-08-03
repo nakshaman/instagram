@@ -112,4 +112,9 @@ class AuthMethods {
     }
     return res;
   }
+
+  //logout
+  Future<void> logout() async {
+    await _firebaseAuth.signOut();
+  }
 }
