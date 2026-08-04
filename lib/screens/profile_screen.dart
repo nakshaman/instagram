@@ -62,10 +62,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isFollowing = user['followers'].contains(
         FirebaseAuth.instance.currentUser!.uid,
       );
+      if (!mounted) return;
       setState(() {});
     } catch (e) {
       showSnackBar(e.toString(), context);
     }
+    if (!mounted) return;
     setState(() {
       isLoading = false;
     });
@@ -222,54 +224,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       .collection('posts')
                       .where('uid', isEqualTo: widget.uid)
                       .get(),
-                  builder: ((context, posts) {
-                    if (posts.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1,
-                          color: primaryColor,
-                        ),
-                      );
-                    }
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: (posts.data! as dynamic).docs.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 5,
-                            mainAxisSpacing: 1.5,
-                            childAspectRatio: 1,
-                          ),
-                      itemBuilder: (context, index) {
-                        DocumentSnapshot snap =
-                            (posts.data! as dynamic).docs[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => Scaffold(
-                                  appBar: AppBar(),
-                                  body: PostCard(
-                                    post: snap.data() as Map<String, dynamic>,
+                  builder:
+                      ((
+                        context,
+                        AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                        posts,
+                      ) {
+                        if (posts.connectionState == ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1,
+                              color: primaryColor,
+                            ),
+                          );
+                        }
+                        final docs = posts.data!.docs;
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: docs.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 5,
+                                mainAxisSpacing: 1.5,
+                                childAspectRatio: 1,
+                              ),
+                          itemBuilder: (context, index) {
+                            final post = docs[index].data();
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => StreamBuilder(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('posts')
+                                          .doc(post['postId'])
+                                          .snapshots(),
+                                      builder: ((context, snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: primaryColor,
+                                            ),
+                                          );
+                                        }
+                                        return Scaffold(
+                                          appBar: AppBar(),
+                                          body: PostCard(
+                                            post: snapshot.data!.data()!,
+                                          ),
+                                        );
+                                      }),
+                                    ),
                                   ),
+                                );
+                              },
+                              child: Image(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(
+                                  post['postUrl'],
                                 ),
                               ),
                             );
                           },
-                          child: Container(
-                            child: Image(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(
-                                snap['postUrl'],
-                              ),
-                            ),
-                          ),
                         );
-                      },
-                    );
-                  }),
+                      }),
                 ),
               ],
             ),
