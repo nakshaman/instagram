@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,9 @@ import 'package:insta/resources/auth_methods.dart';
 import 'package:insta/resources/firestore_methods.dart';
 import 'package:insta/utils/colors.dart';
 import 'package:insta/utils/utils.dart';
+import 'package:insta/widgets/display_picture.dart';
 import 'package:insta/widgets/follow_button.dart';
+import 'package:insta/widgets/post_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String uid;
@@ -79,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : Scaffold(
             appBar: AppBar(
               title: Text(
-                user['username'] ?? "",
+                user['username'],
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -95,12 +99,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Row(
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            backgroundImage: NetworkImage(
-                              user['photoUrl'] ?? "",
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => DisplayPicture(
+                                    image: user['photoUrl'],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey,
+                              backgroundImage: NetworkImage(
+                                user['photoUrl'],
+                              ),
+                              radius: 40,
                             ),
-                            radius: 40,
                           ),
                           Expanded(
                             flex: 1,
@@ -218,6 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                     return GridView.builder(
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: (posts.data! as dynamic).docs.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -229,11 +245,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       itemBuilder: (context, index) {
                         DocumentSnapshot snap =
                             (posts.data! as dynamic).docs[index];
-                        return Container(
-                          child: Image(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(
-                              snap['postUrl'],
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => Scaffold(
+                                  appBar: AppBar(),
+                                  body: PostCard(
+                                    post: snap.data() as Map<String, dynamic>,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            child: Image(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(
+                                snap['postUrl'],
+                              ),
                             ),
                           ),
                         );

@@ -33,6 +33,7 @@ class FirestoreMethods {
         datePublished: DateTime.now(),
         profileImage: profileImage,
         likes: [],
+        commentCount: 0,
       );
 
       await _firebaseFirestore
@@ -94,6 +95,9 @@ class FirestoreMethods {
                 'likes': [],
               },
             );
+        await _firebaseFirestore.collection('posts').doc(postId).update({
+          'commentCount': FieldValue.increment(1),
+        });
       } else {
         log('comment text is empty');
       }
@@ -176,5 +180,4 @@ class FirestoreMethods {
     }
     return res;
   }
-
 }

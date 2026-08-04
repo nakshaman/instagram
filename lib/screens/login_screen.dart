@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:insta/resources/auth_methods.dart';
+import 'package:insta/responsive/mobile_screen_layout.dart';
+import 'package:insta/responsive/responsive_layout_screen.dart';
+import 'package:insta/responsive/web_screen_layout.dart';
 import 'package:insta/screens/sign_up_screen.dart';
 import 'package:insta/utils/colors.dart';
 import 'package:insta/utils/global_variables.dart';
@@ -52,16 +55,16 @@ class _LoginScreenState extends State<LoginScreen> {
       log(res);
       log(FirebaseAuth.instance.currentUser!.uid);
       // Navigate to the home screen
-      // if (mounted) {
-      //   Navigator.of(context).pushReplacement(
-      //     MaterialPageRoute(
-      //       builder: (context) => const ResponsiveLayoutScreen(
-      //         webScreenLayout: WebScreenLayout(),
-      //         mobileScreenLayout: MobileScreenLayout(),
-      //       ),
-      //     ),
-      //   );
-      // }
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const ResponsiveLayoutScreen(
+              webScreenLayout: WebScreenLayout(),
+              mobileScreenLayout: MobileScreenLayout(),
+            ),
+          ),
+        );
+      }
     }
   }
 

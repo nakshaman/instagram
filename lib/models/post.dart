@@ -8,7 +8,8 @@ class Post {
   final String postId;
   final datePublished;
   final String profileImage;
-  final  likes;
+  final likes;
+  final int commentCount;
 
   Post({
     required this.description,
@@ -19,9 +20,11 @@ class Post {
     required this.datePublished,
     required this.profileImage,
     required this.likes,
+    required this.commentCount,
   });
 
   Map<String, dynamic> toJson() => {
+    "commentCount": commentCount,
     "description": description,
     "uid": uid,
     "username": username,
@@ -35,6 +38,7 @@ class Post {
   static Post fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
     return Post(
+      commentCount: snapshot['commentCount'],
       description: snapshot['description'],
       uid: snapshot['uid'],
       username: snapshot['username'],

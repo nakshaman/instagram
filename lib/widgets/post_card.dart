@@ -25,6 +25,7 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
     log('Build called');
     // log(widget.post.toString());
 
@@ -125,7 +126,7 @@ class _PostCardState extends State<PostCard> {
               await FirestoreMethods().likePost(
                 postId: widget.post['postId'],
                 likes: widget.post['likes'],
-                uid: FirebaseAuth.instance.currentUser!.uid,
+                uid: currentUserUid,
               );
               setState(() {
                 isLikeAnimating = true;
@@ -178,7 +179,7 @@ class _PostCardState extends State<PostCard> {
                         await FirestoreMethods().likePost(
                           postId: widget.post['postId'],
                           likes: widget.post['likes'],
-                          uid: widget.post['uid'],
+                          uid: currentUserUid,
                         );
                       },
                       icon: widget.post['likes'].contains(user.uid)
@@ -260,14 +261,23 @@ class _PostCardState extends State<PostCard> {
                 ),
                 // Comments
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CommentScreen(
+                          postId: widget.post['postId'],
+                        ),
+                      ),
+                    );
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: const Text(
-                      'View all 200 comments',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+                    child: Text(
+                      widget.post['commentCount'] == 0
+                          ? 'No comments yet'
+                          : widget.post['commentCount'] == 1
+                          ? 'View 1 comment'
+                          : 'View all ${widget.post['commentCount']} comments',
                     ),
                   ),
                 ),
