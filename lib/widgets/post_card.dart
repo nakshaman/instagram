@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:insta/provider/user_provider.dart';
@@ -124,7 +125,7 @@ class _PostCardState extends State<PostCard> {
               await FirestoreMethods().likePost(
                 postId: widget.post['postId'],
                 likes: widget.post['likes'],
-                uid: widget.post['uid'],
+                uid: FirebaseAuth.instance.currentUser!.uid,
               );
               setState(() {
                 isLikeAnimating = true;
