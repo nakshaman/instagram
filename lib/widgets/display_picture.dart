@@ -16,11 +16,12 @@ class _DisplayPictureState extends State<DisplayPicture> {
       body: Stack(
         children: [
           GestureDetector(
-            behavior: HitTestBehavior.opaque,
+            // behavior: HitTestBehavior.opaque,
             onTap: () => Navigator.pop(context),
           ),
           Center(
             child: CircleAvatar(
+              backgroundColor: Colors.black,
               radius: MediaQuery.of(context).size.width * 0.7,
               backgroundImage: NetworkImage(widget.image),
             ),

@@ -1,15 +1,13 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:insta/resources/auth_methods.dart';
 import 'package:insta/resources/firestore_methods.dart';
+import 'package:insta/screens/post_detail_screen.dart';
 import 'package:insta/utils/colors.dart';
 import 'package:insta/utils/utils.dart';
 import 'package:insta/widgets/display_picture.dart';
 import 'package:insta/widgets/follow_button.dart';
-import 'package:insta/widgets/post_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String uid;
@@ -246,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
-                                crossAxisSpacing: 5,
+                                crossAxisSpacing: 4,
                                 mainAxisSpacing: 1.5,
                                 childAspectRatio: 1,
                               ),
@@ -256,35 +254,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection('posts')
-                                          .doc(post['postId'])
-                                          .snapshots(),
-                                      builder: ((context, snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: primaryColor,
-                                            ),
-                                          );
-                                        }
-                                        return Scaffold(
-                                          appBar: AppBar(),
-                                          body: PostCard(
-                                            post: snapshot.data!.data()!,
-                                          ),
-                                        );
-                                      }),
+                                    builder: (context) => PostDetailScreen(
+                                      post: post,
                                     ),
                                   ),
                                 );
                               },
-                              child: Image(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(
+                              child: Hero(
+                                tag: post['postId'],
+                                child: Image.network(
                                   post['postUrl'],
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             );
