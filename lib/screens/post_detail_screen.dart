@@ -25,6 +25,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         .doc(widget.post['postId'])
         .snapshots()
         .listen((snapshot) {
+          if (!snapshot.exists) return;
           setState(() {
             post = snapshot.data()!;
           });
