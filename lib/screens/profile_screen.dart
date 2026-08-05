@@ -109,12 +109,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               );
                             },
-                            child: CircleAvatar(
-                              backgroundColor: Colors.grey,
-                              backgroundImage: NetworkImage(
-                                user['photoUrl'],
+                            child: Hero(
+                              tag: user['photoUrl'],
+                              child: CircleAvatar(
+                                backgroundColor: Colors.grey,
+                                backgroundImage: NetworkImage(
+                                  user['photoUrl'],
+                                ),
+                                radius: 40,
                               ),
-                              radius: 40,
                             ),
                           ),
                           Expanded(

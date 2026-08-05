@@ -20,10 +20,13 @@ class _DisplayPictureState extends State<DisplayPicture> {
             onTap: () => Navigator.pop(context),
           ),
           Center(
-            child: CircleAvatar(
-              backgroundColor: Colors.black,
-              radius: MediaQuery.of(context).size.width * 0.7,
-              backgroundImage: NetworkImage(widget.image),
+            child: Hero(
+              tag: widget.image,
+              child: CircleAvatar(
+                backgroundColor: Colors.black,
+                radius: MediaQuery.of(context).size.width * 0.7,
+                backgroundImage: NetworkImage(widget.image),
+              ),
             ),
           ),
         ],
