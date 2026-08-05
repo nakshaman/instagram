@@ -6,7 +6,9 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:insta/provider/user_provider.dart';
 import 'package:insta/resources/firestore_methods.dart';
 import 'package:insta/screens/comment_screen.dart';
+import 'package:insta/screens/profile_screen.dart';
 import 'package:insta/utils/colors.dart';
+import 'package:insta/utils/global_variables.dart';
 import 'package:insta/utils/utils.dart';
 import 'package:insta/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
@@ -26,13 +28,17 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
-    log('Build called');
-    // log(widget.post.toString());
+    final size = MediaQuery.of(context).size.width;
 
     final user = Provider.of<UserProvider>(context).getUser!;
     return Container(
+      margin: EdgeInsets.only(bottom: size > webScreenSize ? 8 : 0),
       width: double.infinity,
       decoration: BoxDecoration(
+        border: Border.all(
+          color: size > webScreenSize ? navBarBorder : mobileBackgroundColor,
+          width: 2,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -46,9 +52,19 @@ class _PostCardState extends State<PostCard> {
             ).copyWith(right: 0),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundImage: NetworkImage(widget.post['profileImage']),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProfileScreen(uid: widget.post['uid']),
+                      ),
+                    );
+                  },
+                  child: CircleAvatar(
+                    radius: 16,
+                    backgroundImage: NetworkImage(widget.post['profileImage']),
+                  ),
                 ),
                 Expanded(
                   child: Padding(
@@ -72,9 +88,12 @@ class _PostCardState extends State<PostCard> {
                     showModalBottomSheet(
                       context: context,
                       backgroundColor: mobileBackgroundColor,
-                      shape: const RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(24),
+                          top: const Radius.circular(24),
+                          bottom: size > webScreenSize
+                              ? const Radius.circular(24)
+                              : const Radius.circular(0),
                         ),
                       ),
                       builder: (context) {

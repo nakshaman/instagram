@@ -62,52 +62,67 @@ class _WebScreenLayoutState extends State<WebScreenLayout> {
       );
     }
     return Scaffold(
-      appBar: AppBar(
-        title: SvgPicture.asset(
-          'assets/ic_instagram.svg',
-          color: primaryColor,
-        ),
-        centerTitle: false,
-        actions: [
-          GNav(
-            selectedIndex: currentPageIndex,
-            gap: 10,
-            onTabChange: onTabChange,
-            tabBorderRadius: 20,
-            tabBackgroundColor: Colors.grey.shade800,
-            activeColor: Colors.white,
-            color: Colors.grey,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 10,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0),
+        child: AppBar(
+          title: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: SvgPicture.asset(
+              'assets/ic_instagram.svg',
+              color: primaryColor,
             ),
-            curve: Curves.easeOutQuad,
-            tabs: const [
-              GButton(
-                icon: Icons.circle,
-                leading: HugeIcon(icon: HugeIcons.strokeRoundedHome01),
-              ),
-              GButton(
-                icon: Icons.circle,
-                leading: HugeIcon(icon: HugeIcons.strokeRoundedSearch01),
-              ),
-              GButton(
-                icon: Icons.circle,
-                leading: HugeIcon(icon: HugeIcons.strokeRoundedAddCircle),
-              ),
-              GButton(
-                icon: Icons.circle,
-                leading: HugeIcon(icon: HugeIcons.strokeRoundedFavourite),
-              ),
-              GButton(
-                icon: Icons.circle,
-                leading: HugeIcon(icon: HugeIcons.strokeRoundedUser03),
-              ),
-            ],
           ),
-        ],
+          centerTitle: false,
+          actions: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(.80),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              child: GNav(
+                selectedIndex: currentPageIndex,
+                gap: 10,
+                onTabChange: onTabChange,
+                tabBorderRadius: 20,
+                tabBackgroundColor: Colors.grey.shade800,
+                activeColor: Colors.white,
+                color: Colors.grey,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                curve: Curves.easeOutQuad,
+                tabs: const [
+                  GButton(
+                    icon: Icons.circle,
+                    leading: HugeIcon(icon: HugeIcons.strokeRoundedHome01),
+                  ),
+                  GButton(
+                    icon: Icons.circle,
+                    leading: HugeIcon(icon: HugeIcons.strokeRoundedSearch01),
+                  ),
+                  GButton(
+                    icon: Icons.circle,
+                    leading: HugeIcon(icon: HugeIcons.strokeRoundedAddCircle),
+                  ),
+                  GButton(
+                    icon: Icons.circle,
+                    leading: HugeIcon(icon: HugeIcons.strokeRoundedFavourite),
+                  ),
+                  GButton(
+                    icon: Icons.circle,
+                    leading: HugeIcon(icon: HugeIcons.strokeRoundedUser03),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
         onPageChanged: onPageChanged,
         children: [

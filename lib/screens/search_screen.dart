@@ -23,50 +23,74 @@ class _SearchScreenState extends State<SearchScreen> {
     searchController.dispose();
   }
 
+  void clearSearch() {
+    setState(() {
+      searchController.clear();
+      isShowUsers = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: TextFormField(
-          cursorColor: primaryColor,
-          showCursor: true,
-          controller: searchController,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color.fromARGB(78, 245, 245, 245),
-            hint: Row(
-              children: [
-                const HugeIcon(
-                  icon: HugeIcons.strokeRoundedSearch01,
-                  size: 25,
-                  color: Colors.white,
+        title: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: TextFormField(
+              cursorColor: primaryColor,
+              showCursor: true,
+              controller: searchController,
+              onChanged: (value) {
+                if (value.trim().isEmpty && isShowUsers) {
+                  setState(() {
+                    isShowUsers = false;
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 36, // Adjust padding area around the icon
+                  minHeight: 36,
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  'Search',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                filled: true,
+                fillColor: const Color.fromARGB(78, 245, 245, 245),
+                hintText: 'Search',
+                hintStyle: const TextStyle(color: Colors.white),
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.only(left: 6, right: 6),
+                  child: HugeIcon(
+                    size: 8,
+                    icon: HugeIcons.strokeRoundedSearch01,
                     color: Colors.white,
-                    fontSize: 16,
                   ),
                 ),
-              ],
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(24),
+                suffixIcon: isShowUsers || searchController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: clearSearch,
+                        icon: const HugeIcon(
+                          color: primaryColor,
+                          icon: HugeIcons.strokeRoundedCancel01,
+                        ),
+                      )
+                    : null,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              onFieldSubmitted: (String search) {
+                setState(() {
+                  isShowUsers = true;
+                });
+              },
             ),
           ),
-          onFieldSubmitted: (String search) {
-            setState(() {
-              isShowUsers = true;
-            });
-          },
         ),
       ),
       body: isShowUsers
@@ -102,32 +126,37 @@ class _SearchScreenState extends State<SearchScreen> {
                       );
                     }
                     final docs = users.data!.docs;
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(top: 10),
-                      itemCount: docs.length,
-                      itemBuilder: (context, index) {
-                        final user = docs[index].data();
-                        return InkWell(
-                          onTap: () {
-                            log(user['username']);
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ProfileScreen(uid: user['uid']),
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(top: 10),
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            final user = docs[index].data();
+                            return InkWell(
+                              onTap: () {
+                                log(user['username']);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProfileScreen(uid: user['uid']),
+                                  ),
+                                );
+                              },
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  radius: 24,
+                                  backgroundImage: NetworkImage(
+                                    user['photoUrl'],
+                                  ),
+                                ),
+                                title: Text(user['username']),
                               ),
                             );
                           },
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              radius: 24,
-                              backgroundImage: NetworkImage(
-                                user['photoUrl'],
-                              ),
-                            ),
-                            title: Text(user['username']),
-                          ),
-                        );
-                      },
+                        ),
+                      ),
                     );
                   },
             )

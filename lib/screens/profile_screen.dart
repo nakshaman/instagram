@@ -73,6 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size.width;
     return isLoading
         ? const Center(
             child: CircularProgressIndicator(
@@ -263,11 +264,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 );
                               },
-                              child: Hero(
-                                tag: post['postId'],
-                                child: Image.network(
-                                  post['postUrl'],
-                                  fit: BoxFit.cover,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4.0),
+                                child: Hero(
+                                  tag: post['postId'],
+                                  child: Image.network(
+                                    post['postUrl'],
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             );
