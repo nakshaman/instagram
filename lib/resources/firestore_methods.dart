@@ -62,6 +62,29 @@ class FirestoreMethods {
         await _firebaseFirestore.collection('posts').doc(postId).update({
           'likes': FieldValue.arrayUnion([uid]),
         });
+        // Send Notification
+        DocumentSnapshot postSnap = await _firebaseFirestore
+            .collection('posts')
+            .doc(postId)
+            .get();
+        DocumentSnapshot userSnap = await _firebaseFirestore
+            .collection('users')
+            .doc(uid)
+            .get();
+
+        String targetId = postSnap['uid'];
+        String postUrl = postSnap['postUrl'];
+        String username = userSnap['username'];
+        String profileImage = userSnap['photoUrl'];
+        await sendNotification(
+          postId: postId,
+          senderProfileImage: profileImage,
+          senderUid: uid,
+          senderUsername: username,
+          targetUid: targetId,
+          type: 'like',
+          postUrl: postUrl,
+        );
       }
     } catch (e) {
       log(e.toString());
@@ -98,6 +121,22 @@ class FirestoreMethods {
         await _firebaseFirestore.collection('posts').doc(postId).update({
           'commentCount': FieldValue.increment(1),
         });
+        DocumentSnapshot postSnap = await _firebaseFirestore
+            .collection('posts')
+            .doc(postId)
+            .get();
+        String targetUid = postSnap['uid'];
+        String postUrl = postSnap['postUrl'];
+        await sendNotification(
+          targetUid: targetUid,
+          senderUid: uid,
+          senderUsername: name,
+          senderProfileImage: profilePic,
+          type: 'comment',
+          postId: postId,
+          commentText: text,
+          postUrl: postUrl,
+        );
       } else {
         log('comment text is empty');
       }
@@ -145,6 +184,13 @@ class FirestoreMethods {
     try {
       await _firebaseFirestore.collection('posts').doc(postId).delete();
       res = "Post deleted successfully";
+      QuerySnapshot notificationSnap = await _firebaseFirestore
+          .collectionGroup('notification')
+          .where('postId', isEqualTo: postId)
+          .get();
+      for (DocumentSnapshot doc in notificationSnap.docs) {
+        await doc.reference.delete();
+      }
     } catch (e) {
       log(e.toString());
     }
@@ -160,6 +206,7 @@ class FirestoreMethods {
           .doc(uid)
           .get();
       List following = (snap.data()! as dynamic)['following'];
+      // unfollowing
       if (following.contains(followId)) {
         await _firebaseFirestore.collection('users').doc(followId).update({
           'followers': FieldValue.arrayRemove([uid]),
@@ -168,16 +215,64 @@ class FirestoreMethods {
           'following': FieldValue.arrayRemove([followId]),
         });
       } else {
+        // following
         await _firebaseFirestore.collection('users').doc(followId).update({
           'followers': FieldValue.arrayUnion([uid]),
         });
         await _firebaseFirestore.collection('users').doc(uid).update({
           'following': FieldValue.arrayUnion([followId]),
         });
+        //  Send Notification
+        String username = snap.data()!['username'];
+        String profileImg = snap.data()!['photoUrl'];
+
+        await sendNotification(
+          targetUid: followId,
+          senderUid: uid,
+          senderUsername: username,
+          type: 'follow',
+          senderProfileImage: profileImg,
+        );
       }
     } catch (e) {
       log(e.toString());
     }
     return res;
+  }
+
+  // send Notification
+  Future<void> sendNotification({
+    required String targetUid,
+    required String senderUid,
+    required String senderUsername,
+    required String senderProfileImage,
+    required String type,
+    String postId = '',
+    String postUrl = '',
+    String commentText = '',
+  }) async {
+    if (senderUid == targetUid) return;
+    try {
+      String notificationId = uuid.v1();
+      await _firebaseFirestore
+          .collection('users')
+          .doc(targetUid)
+          .collection('notification')
+          .doc(notificationId)
+          .set({
+            'notification': notificationId,
+            'type': type,
+            'senderUid': senderUid,
+            'targetUid': targetUid,
+            'senderUsername': senderUsername,
+            'senderProfileImage': senderProfileImage,
+            'postId': postId,
+            'postUrl': postUrl,
+            'commentText': commentText,
+            'timeStamp': FieldValue.serverTimestamp(),
+          });
+    } catch (e) {
+      log(e.toString());
+    }
   }
 }

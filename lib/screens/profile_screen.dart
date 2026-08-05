@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -148,6 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             textColor: primaryColor,
                                             borderColor: Colors.grey,
                                             function: () async {
+                                              log('logout button pressed');
                                               await AuthMethods().logout();
                                             },
                                           )

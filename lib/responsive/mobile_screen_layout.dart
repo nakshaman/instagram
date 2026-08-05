@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -6,6 +5,7 @@ import 'package:insta/models/user.dart' as model;
 import 'package:insta/provider/user_provider.dart';
 import 'package:insta/screens/add_post_screen.dart';
 import 'package:insta/screens/feed_screen.dart';
+import 'package:insta/screens/notification_screen.dart';
 import 'package:insta/screens/profile_screen.dart';
 import 'package:insta/screens/search_screen.dart';
 import 'package:insta/utils/colors.dart';
@@ -71,9 +71,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           const FeedScreen(),
           const SearchScreen(),
           const AddPostScreen(),
-          const Center(
-            child: Text('Favorite'),
-          ),
+          const NotificationScreen(),
           ProfileScreen(
             uid: user.uid,
           ),

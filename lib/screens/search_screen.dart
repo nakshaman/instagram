@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:insta/screens/notification_post_detail.dart';
 import 'package:insta/screens/profile_screen.dart';
 import 'package:insta/utils/colors.dart';
 
@@ -189,14 +190,27 @@ class _SearchScreenState extends State<SearchScreen> {
                     mainAxisSpacing: 2,
                     crossAxisSpacing: 3,
                     children: List.generate(
-                      posts.data!.docs.length,
+                      docs.length,
                       (index) {
+                        final postData = docs[index].data();
+                        final String postId = postData['postId'];
                         return StaggeredGridTile.count(
                           crossAxisCellCount: 1,
                           mainAxisCellCount: index % 7 == 0 ? 2 : 1,
-                          child: Image.network(
-                            posts.data!.docs[index]['postUrl'],
-                            fit: BoxFit.cover,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => NotificationPostDetail(
+                                    postId: postId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.network(
+                              postData['postUrl'],
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         );
                       },
